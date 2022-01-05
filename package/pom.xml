@@ -29,8 +29,35 @@
         <tag>HEAD</tag>
     </scm>
 
+    <properties>
+        <sql.output.path>${basedir}/src/main/resources/openmrs-distro.sql</sql.output.path>
+        <sql.db.path>${basedir}/src/main/resources/</sql.db.path>
+    </properties>
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>Merge SQL Files</id>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+                                <concat destfile="${sql.output.path}" overwrite="yes">
+                                    <filelist dir="${sql.db.path}" files="initial-db.sql,isanteplus-concepts.sql"></filelist>
+                                </concat>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.openmrs.maven.plugins</groupId>
                 <artifactId>openmrs-sdk-maven-plugin</artifactId>
@@ -135,7 +162,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <!-- Deploy OpenMRS distro properties file -->
                         <id>deploy-openmrs-sql</id>
                         <phase>deploy</phase>
                         <goals>
