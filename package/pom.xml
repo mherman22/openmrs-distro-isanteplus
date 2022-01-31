@@ -30,7 +30,6 @@
     </scm>
 
     <properties>
-        <sql.output.path>${basedir}/src/main/resources/openmrs-distro.sql</sql.output.path>
         <sql.db.path>${basedir}/src/main/resources/</sql.db.path>
     </properties>
     <build>
@@ -45,11 +44,10 @@
                         <id>Merge SQL Files</id>
                         <phase>generate-resources</phase>
                         <configuration>
-                            <target>
-                                <concat destfile="${sql.output.path}" overwrite="yes">
-                                    <filelist dir="${sql.db.path}" files="initial-db.sql,isanteplus-concepts.sql"></filelist>
-                                </concat>
-                            </target>
+                            <tasks>
+                                <echo message="unzipping file" />
+                                <unzip src="${sql.db.path}/openmrs-distro.sql.zip" dest="${sql.db.path}" overwrite="true" />
+                            </tasks>
                         </configuration>
                         <goals>
                             <goal>run</goal>

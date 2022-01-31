@@ -23,11 +23,11 @@
 		<connection>scm:git:git@github.com:isanteplus/openmrs-distro-isanteplus.git</connection>
 		<developerConnection>scm:git:git@github.com:isanteplus/openmrs-distro-isanteplus.git</developerConnection>
 		<url>https://github.com/isanteplus/openmrs-distro-isanteplus</url>
-	  	<tag>2.6.0</tag>
-  	</scm>
+		<tag>v2.2.0</tag>
+	</scm>
 
 	<properties>
-		<revision>2.1.1</revision>
+		<revision>2.2.0</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<addresshierarchyVersion>2.11.0</addresshierarchyVersion>
 		<adminuiVersion>1.2.3</adminuiVersion>
