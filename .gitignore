@@ -80,3 +80,7 @@ nb-configuration.xml
 /package/src/main/resources/openmrs-distro.sql
 
 /custom_modules/*.omod
+
+.flattened-pom.xml
+
+.env

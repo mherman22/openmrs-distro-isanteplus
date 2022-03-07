@@ -1,8 +1,23 @@
-iSantePlus OpenMRS Distribution
-===================================
+# iSantePlus OpenMRS Distribution
 
 [![Maven Build](https://github.com/IsantePlus/openmrs-distro-isanteplus/actions/workflows/main.yml/badge.svg)](https://github.com/IsantePlus/openmrs-distro-isanteplus/actions/workflows/main.yml)
 
+
+## 1. Docker-based Startup
+
+```sh
+docker-compose up -d isanteplus isanteplus-mysql 
+```
+
+## Streaming Pipeline Setup
+```sh
+```
+
+
+
+
+
+## Additional Information
 ## Building
 
 To build the distribution, run the following script from the project root directory.

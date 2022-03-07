@@ -1,39 +1,10 @@
 version: "3.8"
 
 services:
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    hostname: nginx
-    restart: unless-stopped
-    ports:
-      - "80:80" # OpenHIM Console
-      # - "3306:3306" # OpenHIM Console
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - /var/www
-      - certs:/etc/ssl/
-  certgen:
-    image: magnitus/certificate-generator:latest
-    environment:
-      COUNTRY: US
-      STATE: WA
-      CITY: SEATTLE
-      ORGANIZATION: I-TECH-UW
-      DEPARTMENT: DIGI
-      EMAIL: cert@sedish-heaiti.org
-      DOMAINS: dev.mydomain.com;test.mydomain.com;localhost
-      CERTIFICATE_DURATION: 11095
-      OUTPUT_CERTIFICATE_INFO: "true"
-      KEY_FILE: "ports.key"
-      CERTIFICATE_FILE: "ports.crt"
-    volumes:
-      - certs:/opt/output
   ###
   # iSantePlus
   ###
   isanteplus:
-    profiles: ['main']
     container_name: isanteplus
     hostname: isanteplus
     image: ghcr.io/isanteplus/docker-isanteplus-server:${ISANTEPLUS_DOCKER_VERSION}
@@ -52,7 +23,6 @@ services:
     - "1044:1044"
 
   isanteplus-mysql:
-    profiles: ['main']
     image: ghcr.io/isanteplus/docker-isanteplus-db:${ISANTEPLUS_DB_VERSION}
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci --sql_mode=""
     restart: unless-stopped
@@ -97,21 +67,6 @@ services:
       - PARQUET_PATH=
       - FHIR_DEBEZIUM_CONFIG_PATH=/deployments/config.json
 
-# QA Framework
-  qa:
-    image: ghcr.io/isanteplus/isanteplus-qaframework:${ISANTEPLUS_QA_VERSION}
-    container_name: qa
-    environment:
-      - ISANTEPLUS_URL=http://isanteplus:8080/openmrs
-      - ISANTEPLUS_USER=admin
-      - ISANTEPLUS_PW=Admin123
-  chrome:
-    image: selenium/standalone-chrome:latest
-    hostname: chrome
-    container_name: chrome
-
 volumes:
-  certs:
-    driver: local
   mysql:
     driver: local
