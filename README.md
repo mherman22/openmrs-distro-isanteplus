@@ -9,8 +9,17 @@
 docker-compose up -d isanteplus isanteplus-mysql 
 ```
 
+If you run into any issues on the first startup, you can restart isanteplus with `docker restart isanteplus`. 
+
 ## Streaming Pipeline Setup
+1. Make sure https://github.com/IsantePlus/openmrs-distro-isanteplus/blob/main/config.json has the correct configuration to connect to the iSantePlus database.
+
+2. Make sure https://github.com/IsantePlus/openmrs-distro-isanteplus/blob/3d17517de350f62f52468bff8ee809c09e441dfe/docker-compose.yml#L55 has the correct information about the isanteplus instance and the target FHIR server for pushing resources. For the docker setup, the iSantePlus instance can be accessed in the docker network at `http://isanteplus:8080/openmrs`. 
+
+3. 
 ```sh
+docker-compose up -d streaming-pipeline
+
 ```
 
 
