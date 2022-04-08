@@ -27,7 +27,7 @@
 	</scm>
 
 	<properties>
-		<revision>2.2.1</revision>
+		<revision>2.3.0</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<addresshierarchyVersion>2.11.0</addresshierarchyVersion>
 		<adminuiVersion>1.2.3</adminuiVersion>
@@ -40,7 +40,7 @@
 		<atomfeedVersion>1.1.1</atomfeedVersion>
 		<calculationVersion>1.2</calculationVersion>
 		<chartsearchVersion>2.0</chartsearchVersion>
-		<coreappsVersion>1.20.1</coreappsVersion>
+		<coreappsVersion>1.21.2</coreappsVersion>
 		<dataexchangeVersion>1.3.2</dataexchangeVersion>
 		<emrapiVersion>1.21.0</emrapiVersion>
 		<eventVersion>2.5</eventVersion>
@@ -53,8 +53,8 @@
 		<htmlwidgetsVersion>1.9.0</htmlwidgetsVersion>
 		<idgenVersion>4.4.1</idgenVersion>
 		<isanteplusreportsVersion>1.1-SNAPSHOT</isanteplusreportsVersion>
-		<isanteplusVersion>1.4.1</isanteplusVersion>
-		<labintegrationVersion>2.1.0</labintegrationVersion>
+		<isanteplusVersion>1.4.2</isanteplusVersion>
+		<labintegrationVersion>2.2.0</labintegrationVersion>
 		<legacyuiVersion>1.3.1</legacyuiVersion>
 		<m2sys-biometricsVersion>1.2.4</m2sys-biometricsVersion>
 		<metadatadeployVersion>1.8.1</metadatadeployVersion>
@@ -73,13 +73,13 @@
 		<reportingRestVersion>1.8.0</reportingRestVersion>
 		<reportinguiVersion>1.3.0</reportinguiVersion>
 		<reportingVersion>1.12.0</reportingVersion>
-		<santedbMpiClientVersion>1.1.0</santedbMpiClientVersion>
+		<santedbMpiClientVersion>1.1.1</santedbMpiClientVersion>
 		<serialization.xstreamVersion>0.2.12</serialization.xstreamVersion>
 		<uicommonsVersion>2.4.0</uicommonsVersion>
 		<uiframeworkVersion>3.11.0</uiframeworkVersion>
 		<uilibraryVersion>2.0.4</uilibraryVersion>
 		<webservices.restVersion>2.19.0</webservices.restVersion>
-		<xdssenderVersion>2.2.1</xdssenderVersion>
+		<xdssenderVersion>2.3.0</xdssenderVersion>
 	</properties>
 
 	<dependencyManagement>
