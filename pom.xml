@@ -73,7 +73,7 @@
 		<reportingRestVersion>1.8.0</reportingRestVersion>
 		<reportinguiVersion>1.3.0</reportinguiVersion>
 		<reportingVersion>1.12.0</reportingVersion>
-		<santedbMpiClientVersion>1.1.1</santedbMpiClientVersion>
+		<santedbMpiClientVersion>1.1.2</santedbMpiClientVersion>
 		<serialization.xstreamVersion>0.2.12</serialization.xstreamVersion>
 		<uicommonsVersion>2.4.0</uicommonsVersion>
 		<uiframeworkVersion>3.11.0</uiframeworkVersion>
