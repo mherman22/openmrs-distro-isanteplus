@@ -27,7 +27,7 @@
 	</scm>
 
 	<properties>
-		<revision>2.3.3</revision>
+		<revision>2.3.4</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<addresshierarchyVersion>2.11.0</addresshierarchyVersion>
 		<adminuiVersion>1.2.3</adminuiVersion>
