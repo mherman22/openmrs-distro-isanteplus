@@ -27,7 +27,7 @@
 	</scm>
 
 	<properties>
-		<revision>2.3.5</revision>
+		<revision>2.3.6</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<addresshierarchyVersion>2.11.0</addresshierarchyVersion>
 		<adminuiVersion>1.2.3</adminuiVersion>
@@ -53,7 +53,7 @@
 		<htmlwidgetsVersion>1.9.0</htmlwidgetsVersion>
 		<idgenVersion>4.4.1</idgenVersion>
 		<isanteplusreportsVersion>1.1-SNAPSHOT</isanteplusreportsVersion>
-		<isanteplusVersion>1.4.3</isanteplusVersion>
+		<isanteplusVersion>1.4.4</isanteplusVersion>
 		<isanteplusFhirVersion>1.0.1</isanteplusFhirVersion>
 		<labOnFhirVersion>1.2.0-SNAPSHOT</labOnFhirVersion>
 		<labintegrationVersion>2.2.0</labintegrationVersion>
