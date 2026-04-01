@@ -26,13 +26,10 @@ RUN rm -f patientflags* && \
 
 
 # Stage 2: Runtime image
-FROM tomcat:7-jre8
+# Use tomcat:7-jre8-slim on a newer base to avoid expired Debian repos
+FROM tomcat:7.0.109-jdk8-adoptopenjdk-hotspot
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl \
-        zip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && rm -rf /usr/local/tomcat/webapps/*
+RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Tomcat config: UTF-8 encoding and relaxed URL characters
 RUN sed -i '/Connector port="8080"/a URIEncoding="UTF-8" relaxedPathChars="[]|" relaxedQueryChars="[]|{}^&#x5c;&#x60;&quot;&lt;&gt;"' \
