@@ -1,24 +1,18 @@
 # Stage 1: Build the distribution using Maven
+# Downloads ~45 core OpenMRS modules from the public OpenMRS Maven repo.
+# iSantePlus-specific modules are added from docker/custom-modules/ instead.
 FROM maven:3.8-eclipse-temurin-8 AS build
-
-# GitHub Packages token for downloading iSantePlus modules
-ARG GITHUB_USERNAME=""
-ARG GITHUB_TOKEN=""
 
 WORKDIR /app
 COPY pom.xml .
 COPY package/ package/
 
-# Configure Maven settings for GitHub Packages authentication
-RUN mkdir -p /root/.m2 && \
-    echo '<settings><servers><server>' \
-    '<id>github-packages</id>' \
-    "<username>${GITHUB_USERNAME}</username>" \
-    "<password>${GITHUB_TOKEN}</password>" \
-    '</server></servers></settings>' > /root/.m2/settings.xml
-
-# Build the distribution (downloads all modules via Maven)
+# Build — some iSantePlus modules will fail (not in public repos).
+# That's fine — custom-modules/ fills the gaps.
 RUN mvn clean package -U -B -DskipTests || true
+
+# Create modules dir if Maven failed entirely
+RUN mkdir -p /app/package/target/distro/web/modules
 
 # Rename modules with incorrect artifact names
 WORKDIR /app/package/target/distro/web/modules
@@ -28,13 +22,13 @@ RUN rename 's/outgoing-(.+).omod$/outgoing-message-exceptions-$1\.omod/' *.omod 
 RUN rename 's/xds-(.+).omod$/xds-sender-$1\.omod/' *.omod || true
 RUN rename 's/santedb-(.+).omod$/santedb-mpiclient-$1\.omod/' *.omod || true
 
-# Replace modules that need custom versions
+# Replace addresshierarchy and patientflags with known-good versions
 RUN rm -f addresshierarchy* && \
     wget -q https://github.com/IsantePlus/isanteplus_installation/raw/main/modules/addresshierarchy-2.11.0-SNAPSHOT.omod || true
 RUN rm -f patientflags* && \
     wget -q https://github.com/IsantePlus/isanteplus_installation/raw/main/modules/patientflags-2.0.0-SNAPSHOT.omod || true
 
-# Overlay custom modules (newer versions that override Maven-built ones)
+# Overlay custom modules (iSantePlus-specific, not in public Maven repos)
 COPY docker/custom-modules/ /app/package/target/distro/web/modules/
 
 

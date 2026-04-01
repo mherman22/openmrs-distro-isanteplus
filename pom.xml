@@ -1231,11 +1231,6 @@
 	<repositories>
 		<!-- Use the Github Packages Repo first when looking up dependencies -->
 		<repository>
-			<id>github-packages</id>
-			<name>Github iSantePlus Packages</name>
-			<url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
-		</repository>
-		<repository>
 			<id>openmrs-repo</id>
 			<name>OpenMRS Nexus Repository</name>
 			<url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
@@ -1244,18 +1239,6 @@
 
 	<distributionManagement>
 		<!-- Deploy to Github Packages -->
-		<repository>
-			<id>github-packages</id>
-			<name>Github iSantePlus Packages</name>
-			<url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
-			<uniqueVersion>false</uniqueVersion>
-		</repository>
-		<snapshotRepository>
-			<id>github-packages</id>
-			<name>Github iSantePlus Packages</name>
-			<url>https://maven.pkg.github.com/isanteplus/isanteplus-packages</url>
-			<uniqueVersion>true</uniqueVersion>
-		</snapshotRepository>
 	</distributionManagement>
 
 </project>
