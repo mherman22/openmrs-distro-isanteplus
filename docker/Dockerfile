@@ -1,18 +1,30 @@
 # Stage 1: Build the distribution using Maven
-# Downloads ~45 core OpenMRS modules from the public OpenMRS Maven repo.
-# iSantePlus-specific modules are added from docker/custom-modules/ instead.
+# Downloads core OpenMRS modules from the public Maven repo.
+# iSantePlus-specific modules are pre-installed from docker/custom-modules/.
 FROM maven:3.8-eclipse-temurin-8 AS build
 
 WORKDIR /app
 COPY pom.xml .
 COPY package/ package/
+COPY docker/custom-modules/ /custom-modules/
 
-# Build — some iSantePlus modules will fail (not in public repos).
-# That's fine — custom-modules/ fills the gaps.
-RUN mvn clean package -U -B -DskipTests || true
+# Pre-install iSantePlus modules into local Maven cache so the SDK plugin finds them
+RUN for omod in /custom-modules/*.omod; do \
+      name=$(basename "$omod" | sed 's/-[0-9].*//' ); \
+      version=$(basename "$omod" | sed "s/${name}-//; s/\.omod//"); \
+      echo "Installing $name:$version"; \
+      mvn install:install-file \
+        -DgroupId=org.openmrs.module \
+        -DartifactId=${name}-omod \
+        -Dversion=$version \
+        -Dpackaging=jar \
+        -Dfile="$omod" \
+        -DgeneratePom=true \
+        -q || true; \
+    done
 
-# Create modules dir if Maven failed entirely
-RUN mkdir -p /app/package/target/distro/web/modules
+# Build the distribution
+RUN mvn clean package -U -B -DskipTests
 
 # Rename modules with incorrect artifact names
 WORKDIR /app/package/target/distro/web/modules
@@ -28,7 +40,7 @@ RUN rm -f addresshierarchy* && \
 RUN rm -f patientflags* && \
     wget -q https://github.com/IsantePlus/isanteplus_installation/raw/main/modules/patientflags-2.0.0-SNAPSHOT.omod || true
 
-# Overlay custom modules (iSantePlus-specific, not in public Maven repos)
+# Overlay custom modules (newer versions replace Maven-resolved ones)
 COPY docker/custom-modules/ /app/package/target/distro/web/modules/
 
 
