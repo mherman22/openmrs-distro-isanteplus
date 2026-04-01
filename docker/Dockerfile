@@ -34,13 +34,7 @@ RUN rename 's/outgoing-(.+).omod$/outgoing-message-exceptions-$1\.omod/' *.omod 
 RUN rename 's/xds-(.+).omod$/xds-sender-$1\.omod/' *.omod || true
 RUN rename 's/santedb-(.+).omod$/santedb-mpiclient-$1\.omod/' *.omod || true
 
-# Replace addresshierarchy and patientflags with known-good versions
-RUN rm -f addresshierarchy* && \
-    wget -q https://github.com/IsantePlus/isanteplus_installation/raw/main/modules/addresshierarchy-2.11.0-SNAPSHOT.omod || true
-RUN rm -f patientflags* && \
-    wget -q https://github.com/IsantePlus/isanteplus_installation/raw/main/modules/patientflags-2.0.0-SNAPSHOT.omod || true
-
-# Overlay custom modules (newer versions replace Maven-resolved ones)
+# Overlay custom modules (iSantePlus-specific, replace Maven-resolved versions)
 COPY docker/custom-modules/ /app/package/target/distro/web/modules/
 
 
