@@ -5,9 +5,9 @@ FROM maven:3.8-eclipse-temurin-8 AS module-builder
 WORKDIR /modules
 
 # Clone and build each iSantePlus module from the IsantePlus GitHub org
-RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-isanteplus.git && \
-    cd openmrs-module-isanteplus && mvn clean package -B -DskipTests -q && \
-    cp omod/target/*.omod /modules/ && cd /modules && rm -rf openmrs-module-isanteplus
+RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-isanteplus-old.git && \
+    cd openmrs-module-isanteplus-old && mvn clean package -B -DskipTests -q && \
+    cp omod/target/*.omod /modules/ && cd /modules && rm -rf openmrs-module-isanteplus-old
 
 RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-xds-sender.git && \
     cd openmrs-module-xds-sender && mvn clean package -B -DskipTests -q && \
