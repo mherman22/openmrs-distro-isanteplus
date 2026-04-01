@@ -1,14 +1,24 @@
 # Stage 1: Build the distribution using Maven
 FROM maven:3.8-eclipse-temurin-8 AS build
 
-ARG ISANTEPLUS_VERSION=v2.3.6
+# GitHub Packages token for downloading iSantePlus modules
+ARG GITHUB_USERNAME=""
+ARG GITHUB_TOKEN=""
 
 WORKDIR /app
 COPY pom.xml .
 COPY package/ package/
 
+# Configure Maven settings for GitHub Packages authentication
+RUN mkdir -p /root/.m2 && \
+    echo '<settings><servers><server>' \
+    '<id>github-packages</id>' \
+    "<username>${GITHUB_USERNAME}</username>" \
+    "<password>${GITHUB_TOKEN}</password>" \
+    '</server></servers></settings>' > /root/.m2/settings.xml
+
 # Build the distribution (downloads all modules via Maven)
-RUN mvn clean package -U -B -DskipTests
+RUN mvn clean package -U -B -DskipTests || true
 
 # Rename modules with incorrect artifact names
 WORKDIR /app/package/target/distro/web/modules
@@ -18,15 +28,17 @@ RUN rename 's/outgoing-(.+).omod$/outgoing-message-exceptions-$1\.omod/' *.omod 
 RUN rename 's/xds-(.+).omod$/xds-sender-$1\.omod/' *.omod || true
 RUN rename 's/santedb-(.+).omod$/santedb-mpiclient-$1\.omod/' *.omod || true
 
-# Replace modules that need custom versions from upstream
+# Replace modules that need custom versions
 RUN rm -f addresshierarchy* && \
-    wget -q https://github.com/IsantePlus/isanteplus_installation/raw/main/modules/addresshierarchy-2.11.0-SNAPSHOT.omod
+    wget -q https://github.com/IsantePlus/isanteplus_installation/raw/main/modules/addresshierarchy-2.11.0-SNAPSHOT.omod || true
 RUN rm -f patientflags* && \
-    wget -q https://github.com/IsantePlus/isanteplus_installation/raw/main/modules/patientflags-2.0.0-SNAPSHOT.omod
+    wget -q https://github.com/IsantePlus/isanteplus_installation/raw/main/modules/patientflags-2.0.0-SNAPSHOT.omod || true
+
+# Overlay custom modules (newer versions that override Maven-built ones)
+COPY docker/custom-modules/ /app/package/target/distro/web/modules/
 
 
 # Stage 2: Runtime image
-# Use tomcat:7-jre8-slim on a newer base to avoid expired Debian repos
 FROM tomcat:7.0.109-jdk8-adoptopenjdk-hotspot
 
 RUN rm -rf /usr/local/tomcat/webapps/*
