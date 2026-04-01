@@ -1,59 +1,15 @@
-# Stage 1: Build iSantePlus-specific modules from source
-# These are not in public Maven repos — we clone and build them.
-FROM maven:3.8-eclipse-temurin-8 AS module-builder
-
-WORKDIR /modules
-
-# Clone and build each iSantePlus module from the IsantePlus GitHub org
-RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-isanteplus-old.git && \
-    cd openmrs-module-isanteplus-old && mvn clean package -B -DskipTests -q && \
-    cp omod/target/*.omod /modules/ && cd /modules && rm -rf openmrs-module-isanteplus-old
-
-RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-xds-sender.git && \
-    cd openmrs-module-xds-sender && mvn clean package -B -DskipTests -q && \
-    cp omod/target/*.omod /modules/ && cd /modules && rm -rf openmrs-module-xds-sender
-
-RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-mpi-client.git && \
-    cd openmrs-module-mpi-client && mvn clean package -B -DskipTests -q && \
-    cp omod/target/*.omod /modules/ && cd /modules && rm -rf openmrs-module-mpi-client
-
-RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-outgoing-exception.git && \
-    cd openmrs-module-outgoing-exception && mvn clean package -B -DskipTests -q && \
-    cp omod/target/*.omod /modules/ && cd /modules && rm -rf openmrs-module-outgoing-exception
-
-RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-m2sys-biometrics.git && \
-    cd openmrs-module-m2sys-biometrics && mvn clean package -B -DskipTests -q && \
-    cp omod/target/*.omod /modules/ && cd /modules && rm -rf openmrs-module-m2sys-biometrics
-
-RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-haiticore.git && \
-    cd openmrs-module-haiticore && mvn clean package -B -DskipTests -q && \
-    cp omod/target/*.omod /modules/ && cd /modules && rm -rf openmrs-module-haiticore
-
-RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-isanteplusreports.git && \
-    cd openmrs-module-isanteplusreports && mvn clean package -B -DskipTests -q && \
-    cp omod/target/*.omod /modules/ && cd /modules && rm -rf openmrs-module-isanteplusreports
-
-RUN git clone --depth 1 https://github.com/IsantePlus/openmrs-module-labintegration.git && \
-    cd openmrs-module-labintegration && mvn clean package -B -DskipTests -q && \
-    cp omod/target/*.omod /modules/ && cd /modules && rm -rf openmrs-module-labintegration
-
-# Modules that may not have their own repos — keep as pre-built .omod
-COPY docker/custom-modules/addresshierarchy-*.omod /modules/
-COPY docker/custom-modules/patientflags-*.omod /modules/
-COPY docker/custom-modules/referencemetadata-*.omod /modules/
-
-RUN ls -la /modules/*.omod
-
-
-# Stage 2: Build the distribution using Maven
-FROM maven:3.8-eclipse-temurin-8 AS distro-builder
+# Stage 1: Build the distribution using Maven
+# Downloads core OpenMRS modules from the public Maven repo.
+# iSantePlus-specific modules are provided as pre-built .omod files
+# in docker/custom-modules/ (see docker/MODULES.md for rebuild instructions).
+FROM maven:3.8-eclipse-temurin-8 AS build
 
 WORKDIR /app
 COPY pom.xml .
 COPY package/ package/
+COPY docker/custom-modules/ /custom-modules/
 
-# Pre-install all built modules into local Maven cache
-COPY --from=module-builder /modules/*.omod /custom-modules/
+# Pre-install iSantePlus modules into local Maven cache
 RUN for omod in /custom-modules/*.omod; do \
       name=$(basename "$omod" | sed 's/-[0-9].*//' ); \
       version=$(basename "$omod" | sed "s/${name}-//; s/\.omod//"); \
@@ -79,11 +35,11 @@ RUN rename 's/outgoing-(.+).omod$/outgoing-message-exceptions-$1\.omod/' *.omod 
 RUN rename 's/xds-(.+).omod$/xds-sender-$1\.omod/' *.omod || true
 RUN rename 's/santedb-(.+).omod$/santedb-mpiclient-$1\.omod/' *.omod || true
 
-# Overlay freshly built modules (replace Maven-resolved versions)
-COPY --from=module-builder /modules/*.omod /app/package/target/distro/web/modules/
+# Overlay custom modules (replace Maven-resolved versions with our builds)
+COPY docker/custom-modules/ /app/package/target/distro/web/modules/
 
 
-# Stage 3: Runtime image
+# Stage 2: Runtime image
 FROM tomcat:7.0.109-jdk8-adoptopenjdk-hotspot
 
 RUN rm -rf /usr/local/tomcat/webapps/*
@@ -111,17 +67,14 @@ ENV OMRS_CONFIG_MODULE_WEB_ADMIN="true"
 ENV OMRS_DEV_DEBUG_PORT="1044"
 ENV OMRS_WEBAPP_NAME="openmrs"
 
-# Copy built distribution from distro-builder stage
-COPY --from=distro-builder /app/package/target/distro/web/openmrs.war /openmrs/distribution/openmrs_webapps/openmrs.war
-COPY --from=distro-builder /app/package/target/distro/web/modules /openmrs/distribution/openmrs_modules
+# Copy built distribution
+COPY --from=build /app/package/target/distro/web/openmrs.war /openmrs/distribution/openmrs_webapps/openmrs.war
+COPY --from=build /app/package/target/distro/web/modules /openmrs/distribution/openmrs_modules
 
-# Volume for custom modules (overlaid at runtime)
 VOLUME ["/custom_modules"]
-
-# Volume for persistent OpenMRS data
 VOLUME ["/openmrs/data"]
 
-# Copy startup scripts
+# Startup scripts
 COPY docker/startup.sh /usr/local/tomcat/startup.sh
 COPY docker/wait-for-it.sh /usr/local/tomcat/wait-for-it.sh
 COPY docker/post-start.sh /usr/local/tomcat/post-start.sh
