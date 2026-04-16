@@ -1,19 +1,10 @@
-# TODO: Add Workflows
+name: Build
 
-# When this repository is updated, it should trigger:
-##   The execution of a subset of isanteplus tests for a standalone instance
-##   Generation of a new, tagged docker-isanteplus-server image
-##   Generation of a new, tagged docker-isanteplus-db image
-##   New PR into sedish-haiti.org with automatically running CI
-
-name: Maven Build
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
   release:
     types: [ published ]
   workflow_dispatch:
@@ -21,26 +12,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 8.0.232
-      - name: Cache Maven packages
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-      - uses: s4u/maven-settings-action@v2.2.0
-        with:
-          servers: |
-            [{
-                "id": "github-packages",
-                "username": "${{ secrets.RELEASE_USERNAME }}",
-                "password": "${{ secrets.RELEASE_TOKEN }}"
-            }]
-          githubServer: false
-      - name: Build
-        run: mvn -B package
 
+    env:
+      RELEASE_USERNAME: ${{ github.actor }}
+      RELEASE_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v5.2.0
+        with:
+          java-version: '8'
+          distribution: zulu
+          cache: maven
+          server-id: github-packages
+          server-username: RELEASE_USERNAME
+          server-password: RELEASE_TOKEN
+
+      - name: Build
+        run: mvn -B -P github-packages package
